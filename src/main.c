@@ -450,7 +450,7 @@ static int init_wayland(struct wayvnc* self)
 	if (!self->keyboard_manager && !self->disable_input) {
 		nvnc_log(NVNC_LOG_ERROR, "Virtual Keyboard protocol not supported by compositor.");
 		nvnc_log(NVNC_LOG_ERROR, "wayvnc may still work if started with --disable-input.");
-		goto failure;
+		//goto failure;
 	}
 
 	if (!self->screencopy.manager) {
