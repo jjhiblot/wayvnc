@@ -186,7 +186,7 @@ static bool registry_add_input(void* data, struct wl_registry* registry,
 
 	if (strcmp(interface, wl_seat_interface.name) == 0) {
 		struct wl_seat* wl_seat =
-			wl_registry_bind(registry, id, &wl_seat_interface, 7);
+			wl_registry_bind(registry, id, &wl_seat_interface, 4);
 		if (!wl_seat)
 			return true;
 
