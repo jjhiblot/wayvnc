@@ -122,6 +122,43 @@ struct wayvnc_client {
 	struct data_control data_control;
 };
 
+static struct nvnc_fb* create_cursor()
+{
+	static char ascii_art[] =
+            "...        ...  "
+            ".##.      .##.  "
+            " .##.    .##.   "
+            "  .##.  .##.    "
+            "   .##.##.      "
+            "    .###.       "
+            "   .##.##.      "
+            "  .##.  .##.    "
+            " .##.    .##.   "
+            ".##.      .##.  "
+            "...        ...  ";
+
+
+	struct nvnc_fb* fb = nvnc_fb_new(16, 11, DRM_FORMAT_RGBA8888, 16);
+	assert(fb);
+
+	uint32_t white = 0xffffffffULL;
+	uint32_t black = 0x000000ffULL;
+
+	uint32_t* pixels = nvnc_fb_get_addr(fb);
+
+	for (int i = 0; i < 16 * 11; ++i) {
+		uint32_t color;
+		switch (ascii_art[i]) {
+			case '.': color = white; break;
+			case '#': color = black; break;
+			default: color = 0;
+		}
+		pixels[i] = color;
+	}
+
+	return fb;
+}
+
 void wayvnc_exit(struct wayvnc* self);
 void on_capture_done(struct screencopy* sc);
 static void on_nvnc_client_new(struct nvnc_client* client);
@@ -714,6 +751,12 @@ int init_nvnc(struct wayvnc* self, const char* addr, uint16_t port, bool is_unix
 	nvnc_set_userdata(self->nvnc, self, NULL);
 
 	nvnc_set_name(self->nvnc, "WayVNC");
+
+	struct nvnc_fb* cursor = create_cursor();
+	assert(cursor);
+
+	nvnc_set_cursor(self->nvnc, cursor, 16, 11, 7, 6, true);
+	nvnc_fb_unref(cursor);
 
 	if (self->cfg.enable_auth &&
 	    nvnc_enable_auth(self->nvnc, self->cfg.private_key_file,
